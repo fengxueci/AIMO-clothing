@@ -57,8 +57,18 @@ export const Quotation = () => {
         designFileUrl = await getDownloadURL(uploadResult.ref);
       }
 
+      // Remove undefined fields and assure string defaults for optional fields
+      const cleanData = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        company: data.company || "",
+        items: data.items,
+        comments: data.comments || "",
+      };
+
       await addDoc(collection(db, path), {
-        ...data,
+        ...cleanData,
         designFileUrl,
         status: 'pending',
         createdAt: Date.now(),
@@ -69,6 +79,8 @@ export const Quotation = () => {
         items: [{ productId: '', quantity: 100 }]
       });
     } catch (error) {
+      console.error(error);
+      alert(t('Failed to submit. Please try again.', '提交失败，请重试。'));
       handleFirestoreError(error, OperationType.WRITE, path);
     } finally {
       setIsUploading(false);
