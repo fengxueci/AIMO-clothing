@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, Outlet } from 'react-router-dom';
-import { Menu, X, Mail, Phone, MessageCircle, Globe } from 'lucide-react';
+import { Menu, X, Mail, Phone, MessageCircle, Globe, Shirt } from 'lucide-react';
 import { useLanguage } from './contexts/LanguageContext';
 import { COMPANY_INFO } from './constants/content';
 import { motion, AnimatePresence } from 'motion/react';
@@ -22,8 +22,9 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <Link to="/" className="flex items-center space-x-2">
+            <Shirt className="w-8 h-8 text-gray-900" />
             <span className="text-2xl font-bold tracking-tighter text-gray-900">
-              {t('AIMO', '爱墨')} <span className="text-gray-400 font-light">CLOTHING</span>
+              Aimo <span className="text-gray-400 font-light">Clothing</span>
             </span>
           </Link>
 
