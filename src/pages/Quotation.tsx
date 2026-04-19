@@ -100,7 +100,7 @@ export const Quotation = () => {
       });
     } catch (error) {
       console.error(error);
-      alert(t('Failed to submit. Please try again.', '提交失败，请重试。'));
+      alert(t('Failed to submit. Please try again. Error: ', '提交失败，请重试。错误信息：') + (error.message || JSON.stringify(error)));
     } finally {
       setIsUploading(false);
     }
