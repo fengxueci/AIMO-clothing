@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "inquiries": {
+      ".read": "auth != null",
+      ".write": true
+    },
+    "messages": {
+      ".read": "auth != null",
+      ".write": true
+    }
+  }
+}
