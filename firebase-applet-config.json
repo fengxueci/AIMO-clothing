@@ -1,8 +1,9 @@
 {
   "projectId": "project-ea3b976d-f4e3-4c3b-af2",
-  "appId": "1:25520886814:web:de71dea4b15d639e344a0f",
+  "appId": "1:25520886814:web:ec52251bc0fea426344a0f",
   "apiKey": "AIzaSyDZywndSQKPHhG0ELBJhxO1zT6mosCei9g",
   "authDomain": "project-ea3b976d-f4e3-4c3b-af2.firebaseapp.com",
+  "databaseURL": "https://project-ea3b976d-f4e3-4c3b-af2-default-rtdb.firebaseio.com",
   "firestoreDatabaseId": "aimo-clothing-db",
   "storageBucket": "project-ea3b976d-f4e3-4c3b-af2.firebasestorage.app",
   "messagingSenderId": "25520886814",

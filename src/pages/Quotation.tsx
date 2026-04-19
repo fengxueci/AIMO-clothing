@@ -6,9 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { FileText, Send, Plus, Trash2, Upload, X, Check } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { db, storage } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { rtdb, storage } from '../firebase';
+import { ref as dbRef, push, set } from 'firebase/database';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 
 const quotationSchema = z.object({
@@ -52,7 +52,7 @@ export const Quotation = () => {
       let designFileUrl = '';
 
       if (designFile) {
-        const fileRef = ref(storage, `designs/${Date.now()}_${designFile.name}`);
+        const fileRef = storageRef(storage, `designs/${Date.now()}_${designFile.name}`);
         const uploadResult = await uploadBytes(fileRef, designFile);
         designFileUrl = await getDownloadURL(uploadResult.ref);
       }
@@ -67,7 +67,8 @@ export const Quotation = () => {
         comments: data.comments || "",
       };
 
-      await addDoc(collection(db, path), {
+      const newInquiryRef = push(dbRef(rtdb, path));
+      await set(newInquiryRef, {
         ...cleanData,
         designFileUrl,
         status: 'pending',

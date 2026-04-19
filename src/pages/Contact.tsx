@@ -5,8 +5,8 @@ import { Mail, Phone, MapPin, MessageSquare, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { rtdb } from '../firebase';
+import { ref as dbRef, push, set } from 'firebase/database';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 
 const contactSchema = z.object({
@@ -27,7 +27,8 @@ export const Contact = () => {
   const onSubmit = async (data: ContactFormData) => {
     const path = 'messages';
     try {
-      await addDoc(collection(db, path), {
+      const newMsgRef = push(dbRef(rtdb, path));
+      await set(newMsgRef, {
         ...data,
         createdAt: Date.now(),
       });
