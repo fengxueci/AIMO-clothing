@@ -5,9 +5,7 @@ import { Mail, Phone, MapPin, MessageSquare, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { rtdb } from '../firebase';
-import { ref as dbRef, push, set } from 'firebase/database';
-import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+import { supabase } from '../supabase';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required').max(100),
@@ -25,19 +23,28 @@ export const Contact = () => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    const path = 'messages';
     try {
-      const newMsgRef = push(dbRef(rtdb, path));
-      await set(newMsgRef, {
-        ...data,
-        createdAt: Date.now(),
-      });
+      const { error } = await supabase
+        .from('messages')
+        .insert([
+          {
+            name: data.name,
+            email: data.email,
+            subject: data.subject,
+            message: data.message,
+            created_at: new Date().toISOString()
+          }
+        ]);
+        
+      if (error) {
+        throw error;
+      }
+      
       alert(t('Thank you for your message! We will get back to you soon.', '感谢您的留言！我们会尽快给您回复。'));
       reset();
     } catch (error) {
       console.error(error);
       alert(t('Failed to submit. Please try again.', '提交失败，请重试。'));
-      handleFirestoreError(error, OperationType.WRITE, path);
     }
   };
 

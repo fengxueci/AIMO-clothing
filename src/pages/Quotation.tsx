@@ -6,10 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { FileText, Send, Plus, Trash2, Upload, X, Check } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { rtdb, storage } from '../firebase';
-import { ref as dbRef, push, set } from 'firebase/database';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+import { supabase } from '../supabase';
 
 const quotationSchema = z.object({
   name: z.string().min(2, 'Name is required').max(100),
@@ -46,15 +43,26 @@ export const Quotation = () => {
   });
 
   const onSubmit = async (data: QuotationFormData) => {
-    const path = 'inquiries';
     setIsUploading(true);
     try {
       let designFileUrl = '';
 
       if (designFile) {
-        const fileRef = storageRef(storage, `designs/${Date.now()}_${designFile.name}`);
-        const uploadResult = await uploadBytes(fileRef, designFile);
-        designFileUrl = await getDownloadURL(uploadResult.ref);
+        const fileExt = designFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('designs')
+          .upload(filePath, designFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from('designs')
+          .getPublicUrl(filePath);
+
+        designFileUrl = publicUrlData.publicUrl;
       }
 
       // Remove undefined fields and assure string defaults for optional fields
@@ -67,13 +75,24 @@ export const Quotation = () => {
         comments: data.comments || "",
       };
 
-      const newInquiryRef = push(dbRef(rtdb, path));
-      await set(newInquiryRef, {
-        ...cleanData,
-        designFileUrl,
-        status: 'pending',
-        createdAt: Date.now(),
-      });
+      const { error } = await supabase
+        .from('inquiries')
+        .insert([
+          {
+            name: cleanData.name,
+            email: cleanData.email,
+            phone: cleanData.phone,
+            company: cleanData.company,
+            items: cleanData.items,
+            comments: cleanData.comments,
+            designFileUrl,
+            status: 'pending',
+            created_at: new Date().toISOString()
+          }
+        ]);
+
+      if (error) throw error;
+
       alert(t('Your quotation request has been sent! Our sales team will contact you with a detailed proposal.', '您的报价请求已发送！我们的销售团队将为您提供详细方案。'));
       setDesignFile(null);
       reset({
@@ -82,7 +101,6 @@ export const Quotation = () => {
     } catch (error) {
       console.error(error);
       alert(t('Failed to submit. Please try again.', '提交失败，请重试。'));
-      handleFirestoreError(error, OperationType.WRITE, path);
     } finally {
       setIsUploading(false);
     }
