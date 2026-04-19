@@ -98,9 +98,9 @@ export const Quotation = () => {
       reset({
         items: [{ productId: '', quantity: 100 }]
       });
-    } catch (error) {
-      console.error(error);
-      alert(t('Failed to submit. Please try again. Error: ', '提交失败，请重试。错误信息：') + (error.message || JSON.stringify(error)));
+    } catch (error: any) {
+      console.error("Full Error Object:", error);
+      alert(t('Failed to submit. Please try again. Error: ', '提交失败，请重试。错误信息：') + (error?.message || error?.error_description || JSON.stringify(error)));
     } finally {
       setIsUploading(false);
     }
