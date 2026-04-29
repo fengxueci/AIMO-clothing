@@ -95,9 +95,7 @@ export const Quotation = () => {
 
       alert(t('Your quotation request has been sent! Our sales team will contact you with a detailed proposal.', '您的报价请求已发送！我们的销售团队将为您提供详细方案。'));
       setDesignFile(null);
-      reset({
-        items: [{ productId: '', quantity: 100 }]
-      });
+      reset(); // calling reset without arguments will restore defaultValues
     } catch (error: any) {
       console.error("Full Error Object:", error);
       alert(t('Failed to submit. Please try again. Error: ', '提交失败，请重试。错误信息：') + (error?.message || error?.error_description || JSON.stringify(error)));
