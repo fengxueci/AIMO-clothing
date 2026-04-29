@@ -41,7 +41,7 @@ export const Contact = () => {
       }
       
       alert(t('Thank you for your message! We will get back to you soon.', '感谢您的留言！我们会尽快给您回复。'));
-      window.location.reload();
+      window.location.href = '/';
     } catch (error) {
       console.error(error);
       alert(t('Failed to submit. Please try again.', '提交失败，请重试。'));
